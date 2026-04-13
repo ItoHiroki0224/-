@@ -19,7 +19,7 @@ export function Result({ profile, onReset }: ResultProps) {
   }, [profile]);
 
   const shareText = `私の恐竜タイプは【${profile.name}】でした！\n#大恐竜展 #恐竜性格診断`;
-  const shareUrl = "https://ais-pre-sa4bppkm2f45nirfrncukz-143613991723.asia-northeast1.run.app";
+  const shareUrl = window.location.href;
 
   const handleDownload = async () => {
     if (!profile.imageUrl) return;
@@ -36,7 +36,7 @@ export function Result({ profile, onReset }: ResultProps) {
     // Load the profile image
     const img = new Image();
     img.crossOrigin = "anonymous";
-    img.src = `${import.meta.env.BASE_URL}${profile.imageUrl}`;
+    img.src = profile.imageUrl;
 
     await new Promise((resolve) => {
       img.onload = resolve;
@@ -93,7 +93,7 @@ export function Result({ profile, onReset }: ResultProps) {
   const handleNativeShare = async () => {
     if (navigator.share) {
       try {
-        const response = await fetch(`${import.meta.env.BASE_URL}${profile.imageUrl}`);
+        const response = await fetch(profile.imageUrl);
         const blob = await response.blob();
         const file = new File([blob], "dino-result.png", { type: "image/png" });
 
@@ -127,7 +127,7 @@ export function Result({ profile, onReset }: ResultProps) {
         {/* Header Image */}
         <div className="relative overflow-hidden flex items-center justify-center">
           <img 
-            src={`${import.meta.env.BASE_URL}${profile.imageUrl}`} 
+            src={profile.imageUrl} 
             alt={profile.name}
             className="w-full h-auto block"
           />
@@ -188,7 +188,7 @@ export function Result({ profile, onReset }: ResultProps) {
               <div className="flex items-center gap-6">
                 <div className="w-20 h-auto rounded-2xl overflow-hidden shadow-md shrink-0 border-2 border-white bg-white flex items-center justify-center">
                   <img 
-                    src={`${import.meta.env.BASE_URL}${compatibleProfile.imageUrl}`} 
+                    src={compatibleProfile.imageUrl} 
                     alt={compatibleProfile.name}
                     className="w-full h-auto block"
                   />
