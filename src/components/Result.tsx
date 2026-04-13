@@ -1,8 +1,7 @@
 import { motion } from "motion/react";
 import { DinosaurProfile, DinosaurType } from "../types";
-import { RefreshCcw, Share2, Award, Info, Sparkles, Heart, MapPin, Footprints } from "lucide-react";
+import { RefreshCcw, Share2, Info, Sparkles, Heart, MapPin, Download, MessageCircle, Instagram } from "lucide-react";
 import { useEffect, useState } from "react";
-import { GoogleGenAI } from "@google/genai";
 import { DINOSAUR_PROFILES } from "../constants";
 
 interface ResultProps {
@@ -10,106 +9,148 @@ interface ResultProps {
   onReset: () => void;
 }
 
-const COMPATIBILITY_MAP: Record<DinosaurType, DinosaurType> = {
-  "T-Rex": "Triceratops",
-  "Triceratops": "T-Rex",
-  "Stegosaurus": "Zavacephale",
-  "Zavacephale": "Stegosaurus",
-  "Brachiosaurus": "Pteranodon",
-  "Pteranodon": "Brachiosaurus",
-  "Velociraptor": "Pinacosaurus",
-  "Pinacosaurus": "Velociraptor",
-};
-
 export function Result({ profile, onReset }: ResultProps) {
-  const [aiMessage, setAiMessage] = useState<string>("");
-  const [generatedImageUrl, setGeneratedImageUrl] = useState<string>("");
-  const [loading, setLoading] = useState(true);
-  const [imageLoading, setImageLoading] = useState(true);
+  const [imageLoading, setImageLoading] = useState(false);
 
-  const compatibleType = COMPATIBILITY_MAP[profile.type];
-  const compatibleProfile = DINOSAUR_PROFILES.find(p => p.type === compatibleType);
+  const compatibleProfile = DINOSAUR_PROFILES.find(p => p.type === profile.compatibleType);
 
   useEffect(() => {
-    async function generateContent() {
-      try {
-        const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
-        
-        // Generate Message
-        const messagePromise = ai.models.generateContent({
-          model: "gemini-3-flash-preview",
-          contents: `あなたは「大恐竜展」の案内人です。診断結果が「${profile.name}」だったユーザーに対して、その性格を恐竜の生態に例えながら、温かく、かつ博学な雰囲気で150文字程度のメッセージを送ってください。
-          【重要】「ようこそ大恐竜展へ」という挨拶は含めないでください。日本語でお願いします。`,
-        });
-
-        // Generate Image
-        const imagePromise = ai.models.generateContent({
-          model: 'gemini-2.5-flash-image',
-          contents: {
-            parts: [
-              {
-                text: `A high-quality, realistic illustration of a ${profile.scientificName} dinosaur in its natural prehistoric habitat. Cinematic lighting, detailed scales and texture, vibrant environment.`,
-              },
-            ],
-          },
-        });
-
-        const [messageResponse, imageResponse] = await Promise.all([messagePromise, imagePromise]);
-        
-        setAiMessage(messageResponse.text || "");
-        
-        // Extract Image
-        for (const part of imageResponse.candidates?.[0]?.content?.parts || []) {
-          if (part.inlineData) {
-            setGeneratedImageUrl(`data:image/png;base64,${part.inlineData.data}`);
-            break;
-          }
-        }
-      } catch (error) {
-        console.error("AI generation failed", error);
-        setAiMessage(profile.description);
-      } finally {
-        setLoading(false);
-        setImageLoading(false);
-      }
-    }
-    generateContent();
+    // AI image generation disabled to use static profile images
   }, [profile]);
+
+  const shareText = `私の恐竜タイプは【${profile.name}】でした！\n#大恐竜展 #恐竜性格診断`;
+  const shareUrl = "https://ais-pre-sa4bppkm2f45nirfrncukz-143613991723.asia-northeast1.run.app";
+
+  const handleDownload = async () => {
+    if (!profile.imageUrl) return;
+
+    // Create a canvas to composite the share image
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    // Set dimensions (Square for Instagram)
+    canvas.width = 1080;
+    canvas.height = 1080;
+
+    // Load the profile image
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = profile.imageUrl;
+
+    await new Promise((resolve) => {
+      img.onload = resolve;
+    });
+
+    // 1. Background
+    ctx.fillStyle = "#f8fafc";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // 2. Draw Dinosaur Image (Top part)
+    const imgHeight = 750;
+    ctx.drawImage(img, 0, 0, canvas.width, imgHeight);
+
+    // 3. Footer Area
+    ctx.fillStyle = "#1e293b";
+    ctx.fillRect(0, imgHeight, canvas.width, canvas.height - imgHeight);
+
+    // 4. Text Styling
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    // Title: 大恐竜展
+    ctx.fillStyle = "#3b82f6";
+    ctx.font = "bold 40px 'Noto Sans JP', sans-serif";
+    ctx.fillText("大恐竜展 恐竜性格診断結果", canvas.width / 2, imgHeight + 60);
+
+    // Result: Dinosaur Name
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "black 100px 'Noto Sans JP', sans-serif";
+    ctx.fillText(profile.name, canvas.width / 2, imgHeight + 160);
+
+    // CTA: Exhibition Info
+    ctx.fillStyle = "#60a5fa";
+    ctx.font = "bold 30px 'Noto Sans JP', sans-serif";
+    ctx.fillText("会場で本物の化石に会おう！", canvas.width / 2, imgHeight + 250);
+
+    // Download the composite
+    const link = document.createElement("a");
+    link.href = canvas.toDataURL("image/png");
+    link.download = `dino-share-${profile.type}.png`;
+    link.click();
+  };
+
+  const handleXShare = () => {
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
+    window.open(url, "_blank");
+  };
+
+  const handleLineShare = () => {
+    const url = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`;
+    window.open(url, "_blank");
+  };
+
+  const handleNativeShare = async () => {
+    if (navigator.share) {
+      try {
+        const response = await fetch(profile.imageUrl);
+        const blob = await response.blob();
+        const file = new File([blob], "dino-result.png", { type: "image/png" });
+
+        await navigator.share({
+          title: "大恐竜展 恐竜性格診断",
+          text: shareText,
+          url: shareUrl,
+          files: [file],
+        });
+      } catch (error) {
+        console.error("Native share failed", error);
+        // Fallback to text share
+        navigator.share({
+          title: "大恐竜展 恐竜性格診断",
+          text: shareText,
+          url: shareUrl,
+        }).catch(() => {});
+      }
+    } else {
+      handleXShare();
+    }
+  };
 
   return (
     <div className="max-w-3xl mx-auto w-full px-4 py-12">
       <motion.div
         initial={{ y: 40, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border-4 border-[#e5ddd3]"
+        className="bg-white/95 backdrop-blur-xl rounded-[2.5rem] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.1)] overflow-hidden border border-blue-100"
       >
         {/* Header Image */}
-        <div className="relative h-64 md:h-80 overflow-hidden bg-[#f9f7f2]">
-          {imageLoading ? (
-            <div className="w-full h-full flex items-center justify-center animate-pulse bg-[#e5ddd3]">
-              <Sparkles className="text-[#8b5e3c] animate-spin" size={48} />
-            </div>
-          ) : (
-            <img 
-              src={generatedImageUrl || profile.imageUrl} 
-              alt={profile.name}
-              referrerPolicy="no-referrer"
-              className="w-full h-full object-cover"
-            />
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+        <div className="relative overflow-hidden flex items-center justify-center">
+          <img 
+            src={profile.imageUrl} 
+            alt={profile.name}
+            className="w-full h-auto block"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
           <div className="absolute bottom-6 left-8 right-8">
-            <div className="flex items-center gap-2 text-white/80 text-sm font-bold uppercase tracking-widest mb-1">
-              <Award size={16} />
-              Your Dinosaur Match
-            </div>
-            <h2 className="text-4xl md:text-5xl font-black text-white italic tracking-tighter">
+            <h2 className="text-4xl md:text-5xl font-black text-white italic tracking-tighter drop-shadow-2xl">
               {profile.name}
             </h2>
-            <p className="text-white/60 font-mono text-sm">
+            <p className="text-white/90 font-mono text-sm drop-shadow-lg">
               {profile.scientificName}
             </p>
           </div>
+          
+          {/* Download Button Overlay */}
+          {!imageLoading && (
+            <button 
+              onClick={handleDownload}
+              className="absolute top-4 right-4 p-3 bg-white/20 hover:bg-white/40 text-white rounded-full backdrop-blur-md transition-colors border border-white/20"
+              title="画像を保存"
+            >
+              <Download size={20} />
+            </button>
+          )}
         </div>
 
         {/* Content */}
@@ -118,7 +159,7 @@ export function Result({ profile, onReset }: ResultProps) {
             {profile.traits.map((trait, idx) => (
               <span 
                 key={idx}
-                className="px-4 py-1.5 rounded-full text-sm font-bold bg-[#f9f7f2] text-[#8b5e3c] border border-[#e5ddd3]"
+                className="px-4 py-1.5 rounded-full text-sm font-bold bg-blue-50 text-blue-600 border border-blue-100"
               >
                 #{trait}
               </span>
@@ -126,89 +167,122 @@ export function Result({ profile, onReset }: ResultProps) {
           </div>
 
           <div className="space-y-4">
-            <div className="flex items-center gap-2 text-[#4a5d23] font-bold">
+            <div className="flex items-center gap-2 text-blue-700 font-bold">
               <Info size={20} />
-              <h3>性格診断結果</h3>
+              <h3>パーソナリティ解析</h3>
             </div>
-            <div className="bg-[#fdf8f1] p-6 rounded-2xl border-l-4 border-[#4a5d23] relative">
-              {loading ? (
-                <div className="flex items-center gap-3 text-[#8b5e3c] animate-pulse">
-                  <div className="w-2 h-2 bg-current rounded-full" />
-                  <div className="w-2 h-2 bg-current rounded-full" />
-                  <div className="w-2 h-2 bg-current rounded-full" />
-                  <span>化石を復元中...</span>
-                </div>
-              ) : (
-                <p className="text-[#4a3728] leading-relaxed whitespace-pre-wrap">
-                  {aiMessage}
-                </p>
-              )}
+            <div className="bg-slate-50 p-6 rounded-2xl border-l-4 border-blue-600 relative shadow-sm">
+              <p className="text-slate-700 leading-relaxed whitespace-pre-wrap">
+                {profile.description}
+              </p>
             </div>
           </div>
 
           {/* Compatibility Section */}
           {compatibleProfile && (
-            <div className="bg-[#f9f7f2] p-6 rounded-3xl border-2 border-dashed border-[#e5ddd3]">
-              <div className="flex items-center gap-2 text-[#ec4899] font-bold mb-4">
+            <div className="bg-blue-50/50 p-6 rounded-3xl border border-blue-100 shadow-sm">
+              <div className="flex items-center gap-2 text-pink-500 font-bold mb-4">
                 <Heart size={20} fill="currentColor" />
-                <h3>あなたと相性抜群の恐竜</h3>
+                <h3>相性抜群のパートナー</h3>
               </div>
               <div className="flex items-center gap-6">
-                <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-md shrink-0">
+                <div className="w-20 h-auto rounded-2xl overflow-hidden shadow-md shrink-0 border-2 border-white bg-white flex items-center justify-center">
                   <img 
                     src={compatibleProfile.imageUrl} 
                     alt={compatibleProfile.name}
-                    referrerPolicy="no-referrer"
-                    className="w-full h-full object-cover"
+                    className="w-full h-auto block"
                   />
                 </div>
                 <div>
-                  <h4 className="text-xl font-black text-[#4a3728] mb-1">
+                  <h4 className="text-xl font-black text-slate-800 mb-1">
                     {compatibleProfile.name}
                   </h4>
-                  <p className="text-sm text-[#6b5a4a] leading-tight">
-                    {compatibleProfile.description.split('。')[0]}。お互いの個性を尊重し合える最高のパートナーです。
+                  <p className="text-sm text-slate-600 leading-tight">
+                    {profile.compatibilityMessage}
                   </p>
                 </div>
               </div>
             </div>
           )}
 
+          {/* Share Section */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 text-slate-500 font-bold">
+              <Share2 size={20} />
+              <h3>結果を共有する</h3>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <a
+                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col items-center justify-center gap-2 p-4 bg-slate-900 text-white rounded-2xl hover:bg-black transition-colors"
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                </svg>
+                <span className="text-xs font-bold">X</span>
+              </a>
+              <a
+                href={`https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col items-center justify-center gap-2 p-4 bg-[#06C755] text-white rounded-2xl hover:opacity-90 transition-opacity"
+              >
+                <MessageCircle size={24} />
+                <span className="text-xs font-bold">LINE</span>
+              </a>
+              <button
+                onClick={handleDownload}
+                className="flex flex-col items-center justify-center gap-2 p-4 bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] text-white rounded-2xl hover:opacity-90 transition-opacity"
+              >
+                <Instagram size={24} />
+                <span className="text-xs font-bold leading-tight">画像保存<br/>(Instagram用)</span>
+              </button>
+              <button
+                onClick={handleNativeShare}
+                className="flex flex-col items-center justify-center gap-2 p-4 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 transition-colors"
+              >
+                <Share2 size={24} />
+                <span className="text-xs font-bold">その他</span>
+              </button>
+            </div>
+          </div>
+
           {/* Exhibition CTA */}
-          <div className="bg-[#4a5d23] p-8 rounded-3xl text-white relative overflow-hidden group">
+          <div className="bg-blue-600 p-8 rounded-3xl text-white relative overflow-hidden group z-20">
             <div className="relative z-10">
               <div className="flex items-center gap-2 mb-2 opacity-80 text-xs font-bold tracking-widest uppercase">
                 <MapPin size={14} />
-                Special Event
+                Special Exhibition
               </div>
-              <h3 className="text-2xl font-black mb-3">
-                本物の迫力を、その目で。
+              <h3 className="text-2xl font-black mb-3 break-keep">
+                太古のロマン、触れてみて。
               </h3>
-              <p className="text-white/80 text-sm leading-relaxed mb-6">
-                「大恐竜展」では、今回診断された{profile.name}をはじめ、数多くの貴重な全身骨格化石を展示中。
-                太古の息吹を感じる圧倒的なスケールを、ぜひ会場で体感してください。
+              <p className="text-blue-100 text-sm leading-relaxed mb-6 break-keep">
+                ７月11日～９月23日に福島県立博物館で開催される「大恐竜展」では、世界初公開の化石を含む数多くの貴重な資料を展示中。
+                ぜひ会場で体感してください。
               </p>
-              <button className="px-6 py-2.5 bg-white text-[#4a5d23] font-bold rounded-xl text-sm hover:bg-[#fdf8f1] transition-colors">
+              <a 
+                href="https://kyoryu-zavacephale-rinpoche.com/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-block px-8 py-3 bg-white text-blue-600 font-bold rounded-xl text-base hover:bg-blue-50 transition-all whitespace-nowrap shadow-lg active:scale-95 cursor-pointer"
+              >
                 展示会の詳細を見る
-              </button>
+              </a>
             </div>
-            <Footprints size={120} className="absolute -bottom-10 -right-10 text-white/10 rotate-12 group-hover:rotate-0 transition-transform duration-700" />
+            <Sparkles size={120} className="absolute -bottom-10 -right-10 text-white/10 rotate-12 group-hover:rotate-0 transition-transform duration-700" />
           </div>
 
           {/* Action Buttons */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+          <div className="pt-4">
             <button
               onClick={onReset}
-              className="flex items-center justify-center gap-2 px-8 py-4 bg-[#8b5e3c] text-white font-bold rounded-2xl hover:bg-[#7a4e2c] transition-colors shadow-lg"
+              className="w-full flex items-center justify-center gap-2 px-8 py-4 bg-slate-100 text-slate-600 font-bold rounded-2xl hover:bg-slate-200 transition-colors"
             >
               <RefreshCcw size={20} />
               もう一度診断する
-            </button>
-            <button
-              className="flex items-center justify-center gap-2 px-8 py-4 border-2 border-[#e5ddd3] text-[#6b5a4a] font-bold rounded-2xl hover:bg-[#f9f7f2] transition-colors"
-            >
-              <Share2 size={20} />
-              結果をシェアする
             </button>
           </div>
         </div>

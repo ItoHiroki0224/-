@@ -60,7 +60,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen font-sans text-[#4a3728] selection:bg-[#4a5d23]/20">
+    <div className="min-h-screen font-sans text-slate-800 selection:bg-blue-100">
       <DinoBackground />
       
       <main className="relative z-10 min-h-screen flex items-center justify-center py-12">
@@ -109,12 +109,6 @@ export default function App() {
         </AnimatePresence>
       </main>
 
-      {/* Footer Branding */}
-      <footer className="fixed bottom-4 left-0 right-0 text-center pointer-events-none opacity-40">
-        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#8b5e3c]">
-          &copy; 2026 Great Dinosaur Exhibition Digital Experience
-        </p>
-      </footer>
     </div>
   );
 }

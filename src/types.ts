@@ -2,11 +2,11 @@ export type DinosaurType =
   | "T-Rex" 
   | "Pinacosaurus" 
   | "Zavacephale" 
-  | "Triceratops" 
+  | "Ankylosaurus" 
   | "Stegosaurus" 
-  | "Brachiosaurus" 
-  | "Velociraptor" 
-  | "Pteranodon";
+  | "Iguanodon" 
+  | "Megalosaurus" 
+  | "Futabasaurus";
 
 export interface Answer {
   text: string;
@@ -27,4 +27,6 @@ export interface DinosaurProfile {
   traits: string[];
   imageUrl: string;
   color: string;
+  compatibleType: DinosaurType;
+  compatibilityMessage: string;
 }
