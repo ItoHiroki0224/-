@@ -1,6 +1,12 @@
 import { motion } from "motion/react";
 
 export function DinoBackground() {
+  const getAssetUrl = (path: string) => {
+    const base = import.meta.env.BASE_URL;
+    const normalizedBase = base.endsWith('/') ? base : `${base}/`;
+    return `${normalizedBase}${path.replace(/^\//, '')}`;
+  };
+
   return (
     <div className="fixed inset-0 -z-10 overflow-hidden bg-[#1a1a1a]">
       {/* Main Background Image: User Provided Illustration */}
@@ -11,7 +17,7 @@ export function DinoBackground() {
         transition={{ duration: 30, repeat: Infinity, ease: "easeInOut" }}
         className="absolute inset-0 opacity-80"
         style={{ 
-          backgroundImage: `url("${new URL('background.jpg.jpg', window.location.href).href}")`, 
+          backgroundImage: `url("${getAssetUrl('background.jpg.jpg')}")`, 
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}

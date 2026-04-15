@@ -6,6 +6,12 @@ interface LandingProps {
 }
 
 export function Landing({ onStart }: LandingProps) {
+  const getAssetUrl = (path: string) => {
+    const base = import.meta.env.BASE_URL;
+    const normalizedBase = base.endsWith('/') ? base : `${base}/`;
+    return `${normalizedBase}${path.replace(/^\//, '')}`;
+  };
+
   return (
     <div className="flex flex-col items-center justify-center min-h-[80vh] text-center px-6 relative">
       {/* Decorative Elements */}
@@ -40,7 +46,7 @@ export function Landing({ onStart }: LandingProps) {
             className="relative z-10"
           >
             <img 
-              src={new URL('title2.jpg', window.location.href).href} 
+              src={getAssetUrl('title2.jpg')} 
               alt="大恐竜展" 
               className="max-w-full h-auto rounded-3xl shadow-2xl border-4 border-white bg-white/50 object-contain"
             />
