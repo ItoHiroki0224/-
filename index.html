@@ -7,24 +7,16 @@
     <script>
       (function() {
         var path = window.location.pathname;
-        // If the path doesn't end with a slash and doesn't look like a file (no dot in the last segment),
-        // redirect to the version with a trailing slash to ensure relative paths work correctly.
+        // Ensure trailing slash for GitHub Pages compatibility
         if (!path.endsWith('/') && !path.split('/').pop().includes('.')) {
           window.location.replace(path + '/' + window.location.search + window.location.hash);
-          return;
-        }
-        var base = path.substring(0, path.lastIndexOf('/') + 1);
-        if (base && base !== '/') {
-          var baseTag = document.createElement('base');
-          baseTag.href = window.location.origin + base;
-          document.head.appendChild(baseTag);
         }
       })();
     </script>
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="src/main.tsx"></script>
+    <script type="module" src="./src/main.tsx"></script>
   </body>
 </html>
 
