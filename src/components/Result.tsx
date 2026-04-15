@@ -35,7 +35,7 @@ export function Result({ profile, onReset }: ResultProps) {
     // Load the profile image
     const img = new Image();
     img.crossOrigin = "anonymous";
-    img.src = profile.imageUrl;
+    img.src = `${import.meta.env.BASE_URL}${profile.imageUrl}`;
 
     await new Promise((resolve) => {
       img.onload = resolve;
@@ -147,7 +147,7 @@ export function Result({ profile, onReset }: ResultProps) {
         {/* Header Image */}
         <div className="relative overflow-hidden flex items-center justify-center">
           <img 
-            src={profile.imageUrl} 
+            src={`${import.meta.env.BASE_URL}${profile.imageUrl}`} 
             alt={profile.name}
             className="w-full h-auto block"
           />
@@ -208,7 +208,7 @@ export function Result({ profile, onReset }: ResultProps) {
               <div className="flex items-center gap-6">
                 <div className="w-20 h-auto rounded-2xl overflow-hidden shadow-md shrink-0 border-2 border-white bg-white flex items-center justify-center">
                   <img 
-                    src={compatibleProfile.imageUrl} 
+                    src={`${import.meta.env.BASE_URL}${compatibleProfile.imageUrl}`} 
                     alt={compatibleProfile.name}
                     className="w-full h-auto block"
                   />
