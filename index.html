@@ -9,14 +9,14 @@
         var path = window.location.pathname;
         // Ensure trailing slash for GitHub Pages compatibility
         if (!path.endsWith('/') && !path.split('/').pop().includes('.')) {
-          window.location.replace(path + '/' + window.location.search + window.location.hash);
+          window.location.replace(window.location.protocol + '//' + window.location.host + path + '/' + window.location.search + window.location.hash);
         }
       })();
     </script>
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <script type="module" src="src/main.tsx"></script>
   </body>
 </html>
 

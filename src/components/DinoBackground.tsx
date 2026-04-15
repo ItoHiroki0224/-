@@ -11,7 +11,7 @@ export function DinoBackground() {
         transition={{ duration: 30, repeat: Infinity, ease: "easeInOut" }}
         className="absolute inset-0 opacity-80"
         style={{ 
-          backgroundImage: `url("./background.jpg.jpg")`, 
+          backgroundImage: `url("${new URL('background.jpg.jpg', window.location.href).href}")`, 
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}

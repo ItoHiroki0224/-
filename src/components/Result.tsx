@@ -40,8 +40,9 @@ export function Result({ profile, onReset }: ResultProps) {
       img.onerror = () => reject(new Error(`Failed to load image: ${img.src}`));
     });
 
-    // Set src AFTER adding listeners
-    img.src = `./${profile.imageUrl}`;
+    // Resolve path relative to current URL
+    const imageUrl = new URL(profile.imageUrl, window.location.href).href;
+    img.src = imageUrl;
 
     try {
       await imageLoadPromise;
@@ -178,7 +179,7 @@ export function Result({ profile, onReset }: ResultProps) {
         {/* Header Image */}
         <div className="relative overflow-hidden flex items-center justify-center">
           <img 
-            src={`./${profile.imageUrl}`} 
+            src={new URL(profile.imageUrl, window.location.href).href} 
             alt={profile.name}
             className="w-full h-auto block"
           />
@@ -239,7 +240,7 @@ export function Result({ profile, onReset }: ResultProps) {
               <div className="flex items-center gap-6">
                 <div className="w-20 h-auto rounded-2xl overflow-hidden shadow-md shrink-0 border-2 border-white bg-white flex items-center justify-center">
                   <img 
-                    src={`./${compatibleProfile.imageUrl}`} 
+                    src={new URL(compatibleProfile.imageUrl, window.location.href).href} 
                     alt={compatibleProfile.name}
                     className="w-full h-auto block"
                   />
