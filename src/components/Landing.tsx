@@ -40,7 +40,7 @@ export function Landing({ onStart }: LandingProps) {
             className="relative z-10"
           >
             <img 
-              src={`${import.meta.env.BASE_URL}title2.jpg`} 
+              src="title2.jpg" 
               alt="大恐竜展" 
               className="max-w-full h-auto rounded-3xl shadow-2xl border-4 border-white bg-white/50 object-contain"
             />
