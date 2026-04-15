@@ -34,12 +34,21 @@ export function Result({ profile, onReset }: ResultProps) {
 
     // Load the profile image
     const img = new Image();
-    img.crossOrigin = "anonymous";
+    
+    const imageLoadPromise = new Promise((resolve, reject) => {
+      img.onload = resolve;
+      img.onerror = () => reject(new Error(`Failed to load image: ${img.src}`));
+    });
+
+    // Set src AFTER adding listeners
     img.src = `./${profile.imageUrl}`;
 
-    await new Promise((resolve) => {
-      img.onload = resolve;
-    });
+    try {
+      await imageLoadPromise;
+    } catch (error) {
+      console.error("Image loading failed:", error);
+      return null;
+    }
 
     // 1. Background
     ctx.fillStyle = "#f8fafc";
