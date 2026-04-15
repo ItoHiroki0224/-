@@ -28,8 +28,14 @@ export function Quiz({ currentStep, onAnswer }: QuizProps) {
           transition={{ duration: 0.4 }}
           className="space-y-8 bg-white/95 backdrop-blur-xl p-10 rounded-[2.5rem] border border-blue-100 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.05)]"
         >
-          <div className="space-y-2">
-            <div className="w-12 h-1 bg-blue-600 rounded-full opacity-20" />
+          <div className="space-y-4">
+            <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+              <motion.div 
+                initial={{ width: 0 }}
+                animate={{ width: `${((currentStep + 1) / QUESTIONS.length) * 100}%` }}
+                className="h-full bg-blue-600 rounded-full"
+              />
+            </div>
             <h2 className="text-2xl md:text-3xl font-bold text-slate-800 leading-tight">
               {question.text}
             </h2>

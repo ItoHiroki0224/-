@@ -21,13 +21,12 @@ export function Result({ profile, onReset }: ResultProps) {
   const shareText = `私の恐竜タイプは【${profile.name}】でした！\n#大恐竜展 #恐竜性格診断`;
   const shareUrl = window.location.href;
 
-  const handleDownload = async () => {
-    if (!profile.imageUrl) return;
+  const generateCanvas = async (): Promise<HTMLCanvasElement | null> => {
+    if (!profile.imageUrl) return null;
 
-    // Create a canvas to composite the share image
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    if (!ctx) return null;
 
     // Set dimensions (Square for Instagram)
     canvas.width = 1080;
@@ -58,20 +57,31 @@ export function Result({ profile, onReset }: ResultProps) {
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
-    // Title: 大恐竜展
+    // Title
+    ctx.fillStyle = "#3b82f6";
+    ctx.font = "bold 30px 'Noto Sans JP', sans-serif";
+    ctx.fillText("恐竜性格診断", canvas.width / 2, imgHeight + 40);
+
     ctx.fillStyle = "#3b82f6";
     ctx.font = "bold 40px 'Noto Sans JP', sans-serif";
-    ctx.fillText("大恐竜展 恐竜性格診断結果", canvas.width / 2, imgHeight + 60);
+    ctx.fillText("私の性格は", canvas.width / 2, imgHeight + 100);
 
     // Result: Dinosaur Name
     ctx.fillStyle = "#ffffff";
-    ctx.font = "black 100px 'Noto Sans JP', sans-serif";
-    ctx.fillText(profile.name, canvas.width / 2, imgHeight + 160);
+    ctx.font = "black 80px 'Noto Sans JP', sans-serif";
+    ctx.fillText(`${profile.name}でした`, canvas.width / 2, imgHeight + 190);
 
     // CTA: Exhibition Info
     ctx.fillStyle = "#60a5fa";
     ctx.font = "bold 30px 'Noto Sans JP', sans-serif";
-    ctx.fillText("会場で本物の化石に会おう！", canvas.width / 2, imgHeight + 250);
+    ctx.fillText("大恐竜展、福島県立博物館で７月11日～９月23日開催", canvas.width / 2, imgHeight + 270);
+
+    return canvas;
+  };
+
+  const handleDownload = async () => {
+    const canvas = await generateCanvas();
+    if (!canvas) return;
 
     // Download the composite
     const link = document.createElement("a");
@@ -93,24 +103,34 @@ export function Result({ profile, onReset }: ResultProps) {
   const handleNativeShare = async () => {
     if (navigator.share) {
       try {
-        const response = await fetch(profile.imageUrl);
-        const blob = await response.blob();
+        const canvas = await generateCanvas();
+        if (!canvas) throw new Error("Canvas generation failed");
+
+        const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/png"));
+        if (!blob) throw new Error("Blob generation failed");
+
         const file = new File([blob], "dino-result.png", { type: "image/png" });
 
-        await navigator.share({
-          title: "大恐竜展 恐竜性格診断",
-          text: shareText,
-          url: shareUrl,
-          files: [file],
-        });
+        // Check if sharing files is supported
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            title: "大恐竜展 恐竜性格診断",
+            text: shareText,
+            url: shareUrl,
+            files: [file],
+          });
+        } else {
+          // Fallback to text share if files not supported
+          await navigator.share({
+            title: "大恐竜展 恐竜性格診断",
+            text: shareText,
+            url: shareUrl,
+          });
+        }
       } catch (error) {
         console.error("Native share failed", error);
-        // Fallback to text share
-        navigator.share({
-          title: "大恐竜展 恐竜性格診断",
-          text: shareText,
-          url: shareUrl,
-        }).catch(() => {});
+        // Fallback to X intent if native share fails completely
+        handleXShare();
       }
     } else {
       handleXShare();
@@ -253,8 +273,6 @@ export function Result({ profile, onReset }: ResultProps) {
           <div className="bg-blue-600 p-8 rounded-3xl text-white relative overflow-hidden group z-20">
             <div className="relative z-10">
               <div className="flex items-center gap-2 mb-2 opacity-80 text-xs font-bold tracking-widest uppercase">
-                <MapPin size={14} />
-                Special Exhibition
               </div>
               <h3 className="text-2xl font-black mb-3 break-keep">
                 太古のロマン、触れてみて。
@@ -269,7 +287,7 @@ export function Result({ profile, onReset }: ResultProps) {
                 rel="noopener noreferrer"
                 className="inline-block px-8 py-3 bg-white text-blue-600 font-bold rounded-xl text-base hover:bg-blue-50 transition-all whitespace-nowrap shadow-lg active:scale-95 cursor-pointer"
               >
-                展示会の詳細を見る
+                大恐竜展の詳細を見る
               </a>
             </div>
             <Sparkles size={120} className="absolute -bottom-10 -right-10 text-white/10 rotate-12 group-hover:rotate-0 transition-transform duration-700" />
