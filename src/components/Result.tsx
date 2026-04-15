@@ -45,9 +45,31 @@ export function Result({ profile, onReset }: ResultProps) {
     ctx.fillStyle = "#f8fafc";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // 2. Draw Dinosaur Image (Top part)
+    // 2. Draw Dinosaur Image (Top part - Cover logic)
     const imgHeight = 750;
-    ctx.drawImage(img, 0, 0, canvas.width, imgHeight);
+    const imgAspect = img.width / img.height;
+    const canvasAspect = canvas.width / imgHeight;
+    
+    let drawWidth, drawHeight, offsetX, offsetY;
+    
+    if (imgAspect > canvasAspect) {
+      drawHeight = imgHeight;
+      drawWidth = imgHeight * imgAspect;
+      offsetX = (canvas.width - drawWidth) / 2;
+      offsetY = 0;
+    } else {
+      drawWidth = canvas.width;
+      drawHeight = canvas.width / imgAspect;
+      offsetX = 0;
+      offsetY = (imgHeight - drawHeight) / 2;
+    }
+    
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0, 0, canvas.width, imgHeight);
+    ctx.clip();
+    ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+    ctx.restore();
 
     // 3. Footer Area
     ctx.fillStyle = "#1e293b";
