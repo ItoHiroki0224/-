@@ -60,58 +60,91 @@ export function Result({ profile, onReset }: ResultProps) {
     ctx.fillStyle = "#f8fafc";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // 2. Draw Dinosaur Image (Top part - Cover logic)
-    const imgHeight = 750;
+    // 2. Draw Dinosaur Image (Top part - Contain logic to prevent cropping)
+    const imgHeight = 700; // Slightly reduced to give more space for text below
+    const padding = 60; // Padding inside the image area
+    const availableWidth = canvas.width - (padding * 2);
+    const availableHeight = imgHeight - (padding * 2);
+    
     const imgAspect = img.width / img.height;
-    const canvasAspect = canvas.width / imgHeight;
+    const availableAspect = availableWidth / availableHeight;
     
-    let drawWidth, drawHeight, offsetX, offsetY;
-    
-    if (imgAspect > canvasAspect) {
-      drawHeight = imgHeight;
-      drawWidth = imgHeight * imgAspect;
-      offsetX = (canvas.width - drawWidth) / 2;
-      offsetY = 0;
+    let drawWidth, drawHeight;
+    if (imgAspect > availableAspect) {
+      drawWidth = availableWidth;
+      drawHeight = availableWidth / imgAspect;
     } else {
-      drawWidth = canvas.width;
-      drawHeight = canvas.width / imgAspect;
-      offsetX = 0;
-      offsetY = (imgHeight - drawHeight) / 2;
+      drawHeight = availableHeight;
+      drawWidth = availableHeight * imgAspect;
     }
     
-    ctx.save();
-    ctx.beginPath();
-    ctx.rect(0, 0, canvas.width, imgHeight);
-    ctx.clip();
+    const offsetX = (canvas.width - drawWidth) / 2;
+    const offsetY = (imgHeight - drawHeight) / 2;
+    
+    // Fill the background of the image area
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, imgHeight);
+    
+    // Draw the image
     ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
-    ctx.restore();
 
     // 3. Footer Area
     ctx.fillStyle = "#1e293b";
     ctx.fillRect(0, imgHeight, canvas.width, canvas.height - imgHeight);
 
+    // Accent line
+    ctx.fillStyle = profile.color || "#3b82f6";
+    ctx.fillRect(0, imgHeight, canvas.width, 8);
+
     // 4. Text Styling
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
-    // Title
-    ctx.fillStyle = "#3b82f6";
-    ctx.font = "bold 30px 'Noto Sans JP', sans-serif";
-    ctx.fillText("恐竜性格診断", canvas.width / 2, imgHeight + 40);
+    // Subtitle background (pill shape)
+    const subTitleY = imgHeight + 60;
+    ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
+    const pillWidth = 240;
+    const pillHeight = 44;
+    ctx.roundRect(canvas.width / 2 - pillWidth / 2, subTitleY - pillHeight / 2, pillWidth, pillHeight, 22);
+    ctx.fill();
 
-    ctx.fillStyle = "#3b82f6";
-    ctx.font = "bold 40px 'Noto Sans JP', sans-serif";
-    ctx.fillText("私の性格は", canvas.width / 2, imgHeight + 100);
+    // Small Title
+    ctx.fillStyle = "#60a5fa";
+    ctx.font = "bold 24px 'Noto Sans JP', sans-serif";
+    ctx.fillText("恐竜性格診断", canvas.width / 2, subTitleY);
+
+    // Headline
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 44px 'Noto Sans JP', sans-serif";
+    ctx.fillText("私の性格は...", canvas.width / 2, imgHeight + 130);
 
     // Result: Dinosaur Name
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "black 80px 'Noto Sans JP', sans-serif";
-    ctx.fillText(`${profile.name}でした`, canvas.width / 2, imgHeight + 190);
+    ctx.fillStyle = profile.color || "#3b82f6";
+    ctx.font = "black 100px 'Noto Sans JP', sans-serif";
+    // Draw text with a slight shadow for depth
+    ctx.shadowColor = "rgba(0,0,0,0.5)";
+    ctx.shadowBlur = 15;
+    ctx.fillText(profile.name, canvas.width / 2, imgHeight + 220);
+    ctx.shadowBlur = 0; // Reset shadow
 
-    // CTA: Exhibition Info
-    ctx.fillStyle = "#60a5fa";
-    ctx.font = "bold 30px 'Noto Sans JP', sans-serif";
-    ctx.fillText("大恐竜展、福島県立博物館で７月11日～９月23日開催", canvas.width / 2, imgHeight + 270);
+    // Traits (hashtags)
+    ctx.font = "bold 28px 'Noto Sans JP', sans-serif";
+    ctx.fillStyle = "#94a3b8";
+    const traitsText = profile.traits.map(t => `#${t}`).join("  ");
+    ctx.fillText(traitsText, canvas.width / 2, imgHeight + 300);
+
+    // Bottom Bar (Exhibition Info)
+    ctx.fillStyle = "rgba(0,0,0,0.3)";
+    ctx.fillRect(0, canvas.height - 65, canvas.width, 65);
+    
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 21px 'Noto Sans JP', sans-serif";
+    ctx.fillText("大恐竜展 福島県立博物館 7.11-9.23 [検索 🔍 大恐竜展 福島]", canvas.width / 2, canvas.height - 32);
+
+    // Border
+    ctx.strokeStyle = "rgba(255,255,255,0.2)";
+    ctx.lineWidth = 20;
+    ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
 
     return canvas;
   };
@@ -274,36 +307,42 @@ export function Result({ profile, onReset }: ResultProps) {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex flex-col items-center justify-center gap-2 p-4 bg-slate-900 text-white rounded-2xl hover:bg-black transition-colors"
+                title="Xでシェア（テキストのみ）"
               >
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                 </svg>
-                <span className="text-xs font-bold">X</span>
+                <span className="text-xs font-bold">Xでシェア</span>
               </a>
               <a
                 href={`https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex flex-col items-center justify-center gap-2 p-4 bg-[#06C755] text-white rounded-2xl hover:opacity-90 transition-opacity"
+                title="LINEでシェア（テキストのみ）"
               >
                 <MessageCircle size={24} />
-                <span className="text-xs font-bold">LINE</span>
+                <span className="text-xs font-bold">LINEでシェア</span>
               </a>
               <button
                 onClick={handleDownload}
                 className="flex flex-col items-center justify-center gap-2 p-4 bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] text-white rounded-2xl hover:opacity-90 transition-opacity"
               >
-                <Instagram size={24} />
-                <span className="text-xs font-bold leading-tight">画像保存<br/>(Instagram用)</span>
+                <Download size={24} />
+                <span className="text-xs font-bold leading-tight">診断画像を保存</span>
               </button>
               <button
                 onClick={handleNativeShare}
-                className="flex flex-col items-center justify-center gap-2 p-4 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 transition-colors"
+                className="flex flex-col items-center justify-center gap-2 p-4 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200"
               >
                 <Share2 size={24} />
-                <span className="text-xs font-bold">その他</span>
+                <span className="text-xs font-bold">画像＋URLを<br/>まとめてシェア</span>
               </button>
             </div>
+            <p className="text-[10px] text-slate-400 text-center bg-slate-50 py-2 rounded-lg">
+              ※XやLINEで画像を投稿したい場合は、一度「画像を保存」してから投稿してください。<br/>
+              「画像＋URLをまとめてシェア」は対応端末でのみ利用可能です。
+            </p>
           </div>
 
           {/* Exhibition CTA */}
