@@ -5,9 +5,9 @@ export const QUESTIONS: Question[] = [
     id: 1,
     text: "休日の過ごし方は？",
     answers: [
-      { text: "外でアクティブに動きたい！", scores: { "T-Rex": 2, "Megalosaurus": 2, "Zavacephale": 1 } },
+      { text: "外でアクティブに動きたい", scores: { "T-Rex": 2, "Megalosaurus": 2, "Zavacephale": 1 } },
       { text: "家でゆっくり過ごしたい", scores: { "Stegosaurus": 2, "Pinacosaurus": 2, "Ankylosaurus": 1 } },
-      { text: "友達や家族と賑やかに過ごしたい", scores: { "Iguanodon": 2, "Zavacephale": 2, "T-Rex": 1 } },
+      { text: "家族や友人と賑やかに過ごしたい", scores: { "Iguanodon": 2, "Zavacephale": 2, "T-Rex": 1 } },
       { text: "趣味に没頭して自分磨きをしたい", scores: { "Megalosaurus": 1, "Stegosaurus": 1, "Zavacephale": 1, "Ankylosaurus": 1 } },
     ]
   },
@@ -17,7 +17,7 @@ export const QUESTIONS: Question[] = [
     answers: [
       { text: "グイグイ引っ張るリーダー的存在", scores: { "T-Rex": 3, "Megalosaurus": 2 } },
       { text: "みんなを支える縁の下の力持ち", scores: { "Iguanodon": 2, "Ankylosaurus": 2, "Pinacosaurus": 1 } },
-      { text: "一歩引いて周囲を冷静に観察するのが得意", scores: { "Stegosaurus": 2, "Pinacosaurus": 2 } },
+      { text: "一歩引いて全体を把握する調整役", scores: { "Stegosaurus": 2, "Pinacosaurus": 2 } },
       { text: "場をパッと明るくするムードメーカー", scores: { "Zavacephale": 3, "Iguanodon": 1 } },
     ]
   },
@@ -28,17 +28,17 @@ export const QUESTIONS: Question[] = [
       { text: "正面から立ち向かって解決する", scores: { "T-Rex": 2, "Ankylosaurus": 2, "Megalosaurus": 2 } },
       { text: "冷静に分析して効率的な方法を探す", scores: { "Megalosaurus": 1, "Stegosaurus": 1, "Pinacosaurus": 2 } },
       { text: "周りと協力して平和的に解決する", scores: { "Iguanodon": 2 } },
-      { text: "とりあえず様子を見てから動く", scores: { "Ankylosaurus": 1, "Stegosaurus": 1 } },
+      { text: "とりあえず様子を見てから行動する", scores: { "Ankylosaurus": 1, "Stegosaurus": 1 } },
     ]
   },
   {
     id: 4,
     text: "好きな食べ物のタイプは？",
     answers: [
-      { text: "やっぱりガッツリお肉！", scores: { "T-Rex": 3, "Megalosaurus": 3 } },
+      { text: "やっぱりガッツリお肉", scores: { "T-Rex": 3, "Megalosaurus": 3 } },
       { text: "ヘルシーな野菜やフルーツ", scores: { "Iguanodon": 2, "Ankylosaurus": 1, "Pinacosaurus": 1, "Stegosaurus": 1 } },
       { text: "甘いお菓子やかわいいスイーツ", scores: { "Zavacephale": 2 } },
-      { text: "こだわりはない、なんでも美味しい", scores: { "Pinacosaurus": 1, "Ankylosaurus": 1, "Iguanodon": 1 } },
+      { text: "こだわりはない。なんでも美味しい", scores: { "Pinacosaurus": 1, "Ankylosaurus": 1, "Iguanodon": 1 } },
     ]
   },
   {
@@ -67,18 +67,18 @@ export const QUESTIONS: Question[] = [
     answers: [
       { text: "「ビビッ」ときた直感", scores: { "T-Rex": 2, "Zavacephale": 2 } },
       { text: "データや事実に基づいた論理", scores: { "Megalosaurus": 2, "Stegosaurus": 1, "Pinacosaurus": 1 } },
-      { text: "周りのみんながどう思うか", scores: { "Iguanodon": 3, "Ankylosaurus": 1 } },
+      { text: "周囲の人にどう思われるか", scores: { "Iguanodon": 3, "Ankylosaurus": 1 } },
       { text: "これまでの経験と実績", scores: { "Pinacosaurus": 3, "Ankylosaurus": 1 } },
     ]
   },
   {
     id: 8,
-    text: "自分の性格をひと言でいうと？",
+    text: "あなたが「一番やりがいを感じる瞬間」は？",
     answers: [
-      { text: "一度決めたら曲げない「頑固者」", scores: { "T-Rex": 2, "Ankylosaurus": 2, "Pinacosaurus": 1 } },
-      { text: "好奇心旺盛な「自由人」", scores: { "Megalosaurus": 2, "Zavacephale": 1 } },
-      { text: "誰にでも優しい「お人好し」", scores: { "Iguanodon": 3 } },
-      { text: "効率重視の「リアリスト」", scores: { "Megalosaurus": 1, "Stegosaurus": 1, "Pinacosaurus": 1 } },
+      { text: "大きな困難を乗り越えて、最高の結果を出した時", scores: { "T-Rex": 3, "Megalosaurus": 1 } },
+      { text: "自分の立てた計画通りに、物事がスムーズに進んだ時", scores: { "Pinacosaurus": 3, "Ankylosaurus": 1 } },
+      { text: "自分の働きによって、周囲の人が喜んでくれた時", scores: { "Iguanodon": 3, "Ankylosaurus": 1 } },
+      { text: "誰にも真似できない、自分らしいこだわりを貫けた時", scores: { "Stegosaurus": 2, "Zavacephale": 2, "Megalosaurus": 1 } },
     ]
   },
   {
