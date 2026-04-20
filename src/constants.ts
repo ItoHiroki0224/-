@@ -18,7 +18,7 @@ export const QUESTIONS: Question[] = [
       { text: "グイグイ引っ張るリーダー的存在", scores: { "T-Rex": 3, "Megalosaurus": 2 } },
       { text: "みんなを支える縁の下の力持ち", scores: { "Iguanodon": 2, "Ankylosaurus": 2, "Pinacosaurus": 1 } },
       { text: "一歩引いて全体を把握する調整役", scores: { "Stegosaurus": 2, "Pinacosaurus": 2 } },
-      { text: "場をパッと明るくするムードメーカー", scores: { "Zavacephale": 3, "Iguanodon": 1 } },
+      { text: "場を盛り上げるムードメーカー", scores: { "Zavacephale": 3, "Iguanodon": 1 } },
     ]
   },
   {
@@ -108,7 +108,7 @@ export const DINOSAUR_PROFILES: DinosaurProfile[] = [
     type: "T-Rex",
     name: "ティラノサウルス",
     scientificName: "Tyrannosaurus rex",
-    description: "あなたは圧倒的な存在感とリーダーシップを持つ最強の恐竜タイプ。目標に向かって突き進む力強さは周囲を惹きつけ、自然と中心的な存在になります。困難な状況でも決して屈せず、自らの力で道を切り拓いていくその姿は、まさに百獣の王そのものです。決断力に優れ、周囲が迷っている時こそ真価を発揮する頼もしさを持っています。",
+    description: "あなたは圧倒的な存在感とリーダーシップを持つ主人公タイプ。目標に向かって突き進む力強さは周囲を惹きつけ、自然と中心的な存在になります。困難な状況でも決して屈せず、自らの力で道を切り拓いていくことができます。決断力に優れ、周囲が困っている時こそ真価を発揮する頼もしさを持っています。",
     traits: ["リーダーシップ", "情熱的", "自信家", "勇敢"],
     imageUrl: "T-Rex.jpg",
     color: "#ef4444",
